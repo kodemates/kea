@@ -15,7 +15,6 @@ Options:
   -h --help                     Show this screen
   --version                     Show version.
   --path=<path>, -p <path>      Speed in knots [default: .].
-
 '''
 
 

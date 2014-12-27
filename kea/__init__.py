@@ -45,7 +45,8 @@ class Config(object):
         :return: Config
         """
 
-        self.file = path + "/kea.json";
+        self.file = path + "/kea.json"
+
         if os.path.isfile(self.file):
             raise Exception(self.file + " already exists.")
 
@@ -87,7 +88,8 @@ class Config(object):
     def remove_machine(self, name):
         try:
             rtr = self.data['machines'][name]
-            return rtr;
+            del self.data['machines'][name]
+            return rtr
         except KeyError:
             return None
 
@@ -107,16 +109,17 @@ class Config(object):
             return self.data['apps']
 
 
-    def add_app(self, App, **kwargs):
+    def add_app(self, app, **kwargs):
         try:
-            self.data['apps'][App.name] = kwargs;
+            self.data['apps'][app.name] = kwargs;
         except KeyError:
-            self.data['apps'] = {App.name: kwargs}
+            self.data['apps'] = {app.name: kwargs}
         return self
 
-    def remove_app(self, App):
+    def remove_app(self, app):
         try:
-            rtr = self.data['apps'][App.name];
+            rtr = self.data['apps'][app.name]
+            del self.data['apps'][app.name]
             return rtr;
         except KeyError:
             return None
