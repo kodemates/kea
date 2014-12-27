@@ -4,7 +4,12 @@ In early development
 
 Usage:
   kea init
+  kea machine list
   kea machine add <name>
+  kea machine rm <name>
+  kea app list
+  kea app add <name>
+  kea app rm <name>
   kea --version
 
 Options:
