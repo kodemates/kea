@@ -2,6 +2,10 @@ import unittest
 import os
 import json
 
+ssh_cmd = "/usr/bin/ssh"
+docker_cmd  = "/usr/bin/docker"
+sudo_cmd = "/usr/bin/sudo"
+
 class Machine(object):
 
     def __init__(self, name, **kwargs):
@@ -9,24 +13,13 @@ class Machine(object):
         self.name = name
 
     def getSshCheck(self):
-        """
-            TODO : ssh
-        :return:
-        """
+        return [ssh_cmd + " "  + self.name + " /bin/echo \"ssh-ok \""]
 
     def getDockerCheck(self):
-        """
-            TODO : docker -v
-        :return:
-        """
-        pass
+        return [ssh_cmd + " "  + self.name + " " + sudo_cmd + " " + docker_cmd + " -v"]
 
     def getSudoCheck(self):
-        """
-            TODO : sudo -l
-        :return:
-        """
-        pass
+        return [ssh_cmd + " "  + self.name + " " + sudo_cmd + " -v"]
 
     def doRunCommand(self, cmd):
         pass
@@ -182,6 +175,18 @@ if __name__ == '__main__':
 
             os.remove("test/result/kea.json")
 
-if __name__ == '__main__':
+    class  Machine_Test(unittest.TestCase):
+        def test_getSshCheck(self):
+            """
+                for now we relay on a simplified ssh config (usually from 'vagrant ssh-config') to make enable to
+                 connect a host with 'ssh default'
+            :return:
+            """
+            m = Machine('default')
+            self.assertEqual('default', m.name)
+            self.assertEqual(m.getSshCheck(), ['/usr/bin/ssh default /bin/echo "ssh-ok "'])
+            self.assertEqual(m.getDockerCheck(), ['/usr/bin/ssh default /usr/bin/sudo /usr/bin/docker -v'])
+            self.assertEqual(m.getSudoCheck(), ['/usr/bin/ssh default /usr/bin/sudo -v'])
+
     unittest.main()
 
