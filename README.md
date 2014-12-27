@@ -1,12 +1,12 @@
-kea
-===
-
-### Install
-  python setup.py install
+# Kea
+    Kea: Platform as a service
+    In early development
 
 
 ### Usage
    See usage instructions by running:
 
-   python kea/main.py or
-   kea
+       ./kea.sh
+   or
+       python setup.py install
+       kea

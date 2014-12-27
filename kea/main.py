@@ -1,9 +1,8 @@
 '''
-Kea: Platform as a service
-In early development
+Kea
 
 Usage:
-  kea init
+  kea init [--path=.] [--domain=<domain>]
   kea machine list
   kea machine add <name>
   kea machine rm <name>
@@ -13,20 +12,19 @@ Usage:
   kea --version
 
 Options:
-  -h --help     Show this screen.
-  --version     Show version.
-  --speed=<kn>  Speed in knots [default: 10].
-  --moored      Moored (anchored) mine.
-  --drifting    Drifting mine.
+  -h --help                     Show this screen
+  --version                     Show version.
+  --path=<path>, -p <path>      Speed in knots [default: .].
 
 '''
 
 
 from docopt import docopt
+from kea.cli import Command
 
 def main():
-    arguments = docopt(__doc__, version='Kea 0.0')
-    print(arguments)
+    arguments = docopt(__doc__, version='Kea 0.0.0')
+    cmd = Command(arguments)
 
 if __name__ == '__main__':
     main()

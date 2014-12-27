@@ -57,17 +57,17 @@ class Config(object):
         self.data = {}
         self.data['domain'] = domain
 
-        self.save_config();
+        self.save_config()
 
         return self
 
     def load_config(self, path="."):
-        file = path + "/kea.json";
+        file = path + "/kea.json"
         fd = open(file, "r")
-        self.data = json.loads(fd.read());
+        self.data = json.loads(fd.read())
         fd.close()
         self.file = file
-        return self;
+        return self
 
     def save_config(self):
 
@@ -77,21 +77,21 @@ class Config(object):
 
     def add_machine(self, name, **kwargs):
         try:
-            self.data['machines'][name] = kwargs;
+            self.data['machines'][name] = kwargs
         except KeyError:
             self.data['machines'] = {name: kwargs}
         return self
 
     def list_machines(self):
         try:
-            return self.data['machines'];
+            return self.data['machines']
         except KeyError:
             self.data['machines'] = {}
             return self.data['machines']
 
     def remove_machine(self, name):
         try:
-            rtr = self.data['machines'][name];
+            rtr = self.data['machines'][name]
             return rtr;
         except KeyError:
             return None
@@ -106,7 +106,7 @@ class Config(object):
 
     def list_apps(self):
         try:
-            return self.data['apps'];
+            return self.data['apps']
         except KeyError:
             self.data['apps'] = {}
             return self.data['apps']
@@ -152,7 +152,7 @@ if __name__ == '__main__':
                 pass
 
         def test_init(self):
-            config = Config();
+            config = Config()
             config.init("./test/result", "my-domain.com")
             # must exists a file named test/result/kea.json, and must be json valid
             filename = "test/result/kea.json"
@@ -165,20 +165,20 @@ if __name__ == '__main__':
             file_data.close()
             self.assertRaises(Exception, config.init, domain="my-domain.com", path="./test/result")
 
-            config = Config();
-            self.assertRaises(IOError, config.load_config, path="./test/result-no-exist");
-            config.load_config("./test/result");
+            config = Config()
+            self.assertRaises(IOError, config.load_config, path="./test/result-no-exist")
+            config.load_config("./test/result")
 
-            self.assertEqual(config.list_machines(), {});
+            self.assertEqual(config.list_machines(), {})
             config.add_machine('localhost', cmd='/bin/bash')
 
-            self.assertEqual(config.list_machines(), {'localhost': {'cmd': '/bin/bash'}});
-            self.assertEqual(config.remove_machine('localhost'), {'cmd': '/bin/bash'});
-            self.assertEqual(config.remove_machine('non-localhost'), None);
+            self.assertEqual(config.list_machines(), {'localhost': {'cmd': '/bin/bash'}})
+            self.assertEqual(config.remove_machine('localhost'), {'cmd': '/bin/bash'})
+            self.assertEqual(config.remove_machine('non-localhost'), None)
 
-            config.add_app(MockApp("mock-app"), cmd="docker run mediawiki");
-            self.assertEqual(config.list_apps(), {'mock-app': {'cmd': 'docker run mediawiki'}});
-            self.assertEqual(config.remove_app(MockApp('mock-app')), {'cmd': 'docker run mediawiki'});
+            config.add_app(MockApp("mock-app"), cmd="docker run mediawiki")
+            self.assertEqual(config.list_apps(), {'mock-app': {'cmd': 'docker run mediawiki'}})
+            self.assertEqual(config.remove_app(MockApp('mock-app')), {'cmd': 'docker run mediawiki'})
 
             os.remove("test/result/kea.json")
 
