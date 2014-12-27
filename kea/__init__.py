@@ -31,10 +31,6 @@ class Machine(object):
     def doRunCommand(self, cmd):
         pass
 
-    def
-
-
-
 class App(object):
     def __init__(self, name):
         self.name = name
