@@ -10,3 +10,8 @@
    or
        python setup.py install
        kea
+
+### Run unit tests
+
+
+    nosetests -w tests/
