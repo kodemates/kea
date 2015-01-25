@@ -55,8 +55,20 @@ class  Machine_Test(unittest.TestCase):
         self.assertEqual(m.getSudoCheck(), ['/usr/bin/ssh default /usr/bin/sudo -v'])
         self.assertEqual(m.getDockerCheck(), ['/usr/bin/ssh default /usr/bin/sudo /usr/bin/docker -v'])
 
-        self.assertEqual(m.doRunCmd('/bin/echo "ssh-ok"'), 0)
-        self.assertEqual(m.doRunCmd('exit 1'), 1)
-        self.assertEqual(m.doRunCmd('/bin/non-existing-command'), 127)
+        #self.assertEqual(m.doRunCmd('/bin/echo "ssh-ok"'), 0)
+        #self.assertEqual(m.doRunCmd('/bin/cat some-non-existing-file'), 1)
+        #self.assertEqual(m.doRunCmd('/bin/non-existing-command'), 127)
 
 
+class testAppInstall(unittest.TestCase):
+    def test_install_proxy(self):
+        """
+            to run this test you need a ssh config that allows you to connect with the ssh default,
+                also the ssh user must be sudo (with out a password) and docket shuld be already installed.
+        :return:
+        """
+        m = Machine('default')
+        np = NginxProxy('base-proxy')
+        np.install(m)
+        print (np.check(m))
+        np.uninstall(m)
