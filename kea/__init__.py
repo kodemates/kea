@@ -203,6 +203,20 @@ class NginxProxy(App):
         
 
 class MediaWiki(App):
+    def install(self, m):
+        docker_install = m.getDocker() + " run  -e VIRTUAL_HOST=" + self.name + "."+ self.data['domain'] + " -v /data/wiki:/data -d nickstenning/mediawiki"
+        print (docker_install)
+        proc = Popen(docker_install, stdout=PIPE, stderr=PIPE, shell=True)
+        (stdout, stderr) = proc.communicate()
+        print (stdout)
+        container = stdout
+        docker_ps = m.getDocker() + " inspect " + container.decode("utf-8")
+        proc = Popen(docker_ps, stdout=PIPE, stderr=PIPE, shell=True)
+        (stdout, stderr) = proc.communicate()
+        data = json.loads(stdout.decode("utf-8"))
+        self.data = data[0];
+        return proc.returncode == 0;
+
     @staticmethod
     def check(Machine):
         pass

@@ -72,3 +72,9 @@ class testAppInstall(unittest.TestCase):
         np.install(m)
         print (np.check(m))
         np.uninstall(m)
+
+    def test_install_mediawiki(self):
+        m = Machine('default')
+        np = NginxProxy('base-proxy')
+        mw = MediaWiki('wiki', domain="my-domain.com")
+        mw.install(m)
