@@ -37,7 +37,6 @@ class Machine(object):
         :param cmd:
         :return:
         """
-        print (cmd)
         proc = Popen(cmd, stdout=PIPE, stderr=PIPE, shell=True)
         proc.wait()
         return proc.returncode;
@@ -174,7 +173,6 @@ class NginxProxy(App):
         docker_ps = m.getDocker() + " ps -q"
         proc = Popen(docker_ps, stdout=PIPE, stderr=PIPE, shell=True)
         (stdout, stderr) = proc.communicate()
-        print (stdout.splitlines())
         proc.wait()
         rtr = []
         for container in stdout.splitlines():
@@ -182,11 +180,12 @@ class NginxProxy(App):
             proc = Popen(docker_ps, stdout=PIPE, stderr=PIPE, shell=True)
             (stdout, stderr) = proc.communicate()
             data = json.loads(stdout.decode("utf-8"))
-            if (data[0]["NetworkSettings"]['Ports']['80/tcp'][0]['HostPort'] == '80' and #Port OK
-                data[0]['Config']['Image'] == 'zedtux/nginx-proxy' ) : #Image OK
-                # data[0]['Id']
-                dic = data[0]
-                rtr.append(NginxProxy("NginxProxy", **dic))
+            try:
+                if data[0]["NetworkSettings"]['Ports']['80/tcp'][0]['HostPort'] == '80' and \
+                    data[0]['Config']['Image'] == 'zedtux/nginx-proxy':
+                    rtr.append(NginxProxy("NginxProxy", **(data[0])))
+            except TypeError :
+                continue
         return rtr;
 
     def uninstall(self, m):
@@ -204,11 +203,13 @@ class NginxProxy(App):
 
 class MediaWiki(App):
     def install(self, m):
-        docker_install = m.getDocker() + " run  -e VIRTUAL_HOST=" + self.name + "."+ self.data['domain'] + " -v /data/wiki:/data -d nickstenning/mediawiki"
-        print (docker_install)
+        docker_install = m.getDocker() + \
+                        " run  -P -d -e VIRTUAL_HOST=" + self.name + "."+ self.data['domain'] + \
+                         " -v /data/wiki:/data -h "+self.name + "."+ self.data['domain'] + \
+                         " nickstenning/mediawiki"
+
         proc = Popen(docker_install, stdout=PIPE, stderr=PIPE, shell=True)
         (stdout, stderr) = proc.communicate()
-        print (stdout)
         container = stdout
         docker_ps = m.getDocker() + " inspect " + container.decode("utf-8")
         proc = Popen(docker_ps, stdout=PIPE, stderr=PIPE, shell=True)
@@ -218,8 +219,36 @@ class MediaWiki(App):
         return proc.returncode == 0;
 
     @staticmethod
-    def check(Machine):
-        pass
+    def check(m, **kwargs):
+        docker_ps = m.getDocker() + " ps -q"
+        proc = Popen(docker_ps, stdout=PIPE, stderr=PIPE, shell=True)
+        (stdout, stderr) = proc.communicate()
+        proc.wait()
+        rtr = []
+        for container in stdout.splitlines():
+            docker_ps = m.getDocker() + " inspect " + container.decode("utf-8")
+            proc = Popen(docker_ps, stdout=PIPE, stderr=PIPE, shell=True)
+            (stdout, stderr) = proc.communicate()
+            data = json.loads(stdout.decode("utf-8"))
+            try:
+                for env in data[0]['Config']['Env']:
+                    if env.startswith("VIRTUAL_HOST="):
+                        m_domain = env[13:env.find("." + kwargs['domain'])]
+                        rtr.append(MediaWiki(m_domain, **(data[0])))
+            except TypeError :
+                continue
+        return rtr;
+
+    def uninstall(self, m):
+        """
+            Uninstall the app from the Machine, based on uuid name.
+        :param Machine:
+        :return:
+        """
+        docker_install = m.getDocker() + " stop " + self.data['Id']
+        proc = Popen(docker_install, stdout=PIPE, stderr=PIPE, shell=True)
+        proc.wait()
+        return proc.returncode == 0;
 
 
 
