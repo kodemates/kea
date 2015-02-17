@@ -74,11 +74,19 @@ class testAppInstall(unittest.TestCase):
         np.uninstall(m)
 
     def test_install_mediawiki(self):
+        """
+
+        :return:
+        """
         m = Machine('default')
         np = NginxProxy('base-proxy')
         mw = MediaWiki('wiki', domain="my-domain.com")
+        db = MariaDB('db', domain="my-domain.com")
         np.install(m)
         mw.install(m)
-        wikis = MediaWiki.check(m,domain="my-domain.com")
+        db.install(m);
+        #wikis = MediaWiki.check(m,domain="my-domain.com")
+        #marias = MariaDB.check(m,domain="my-domain.com")
         mw.uninstall(m);
+        db.uninstall(m);
         np.uninstall(m);
