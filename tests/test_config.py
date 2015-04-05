@@ -61,7 +61,7 @@ class  Machine_Test(unittest.TestCase):
 
 
 class testAppInstall(unittest.TestCase):
-    def test_install_proxy(self):
+    def no_test_install_proxy(self):
         """
             to run this test you need a ssh config that allows you to connect with the ssh default,
                 also the ssh user must be sudo (with out a password) and docket shuld be already installed.
@@ -73,7 +73,7 @@ class testAppInstall(unittest.TestCase):
         #print (np.check(m))
         np.uninstall(m)
 
-    def test_install_mediawiki(self):
+    def no_test_install_mediawiki(self):
         """
 
         :return:
@@ -90,3 +90,12 @@ class testAppInstall(unittest.TestCase):
         mw.uninstall(m);
         db.uninstall(m);
         np.uninstall(m);
+
+    def test_install_wordpress(self):
+        m = Machine('default')
+        np = NginxProxy('base-proxy')
+        np.install(m)
+        wp = Wordpress('w01', domain="my-domain.com")
+        wp.install(m)
+        wps = Wordpress.check(m,domain="my-domain.com")
+        wp.uninstall(m)

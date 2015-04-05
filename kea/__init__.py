@@ -249,6 +249,50 @@ class MediaWiki(App):
         return proc.returncode == 0;
 
 
+class Wordpress(App):
+    def install(self, m):
+        docker_install = m.getDocker() + " run  -P -d -h "+self.name + "."+ self.data['domain'] + \
+                         " eugeneware/docker-wordpress-nginx"
+        proc = Popen(docker_install, stdout=PIPE, stderr=PIPE, shell=True)
+        (stdout, stderr) = proc.communicate()
+        container = stdout
+        docker_ps = m.getDocker() + " inspect " + container.decode("utf-8")
+        proc = Popen(docker_ps, stdout=PIPE, stderr=PIPE, shell=True)
+        (stdout, stderr) = proc.communicate()
+        data = json.loads(stdout.decode("utf-8"))
+        self.data = data[0];
+        return proc.returncode == 0;
+
+    @staticmethod
+    def check(m, **kwargs):
+        docker_ps = m.getDocker() + " ps -q"
+        proc = Popen(docker_ps, stdout=PIPE, stderr=PIPE, shell=True)
+        (stdout, stderr) = proc.communicate()
+        proc.wait()
+        rtr = []
+        for container in stdout.splitlines():
+            docker_ps = m.getDocker() + " inspect " + container.decode("utf-8")
+            proc = Popen(docker_ps, stdout=PIPE, stderr=PIPE, shell=True)
+            (stdout, stderr) = proc.communicate()
+            data = json.loads(stdout.decode("utf-8"))
+            try:
+                print (data[0]['Config']['Hostname'])
+                print (data[0]['Config']['Image'])
+
+                if data[0]['Config']['Image'] == 'eugeneware/docker-wordpress-nginx' :
+                    m_domain = data[0]['Config']['Hostname'][0:data[0]['Config']['Hostname'].find("." + kwargs['domain'])]
+                    rtr.append(MediaWiki(m_domain, **(data[0])))
+            except TypeError :
+                continue
+        return rtr;
+
+        pass
+
+    def uninstall(self, m):
+        docker_install = m.getDocker() + " stop " + self.data['Id']
+        proc = Popen(docker_install, stdout=PIPE, stderr=PIPE, shell=True)
+        proc.wait()
+        return proc.returncode == 0;
 
 class MariaDB(App):
     def install(self, m):
